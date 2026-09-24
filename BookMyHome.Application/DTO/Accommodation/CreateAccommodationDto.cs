@@ -8,6 +8,8 @@
 
         public decimal PricePerNight { get; set; }
 
+        public string Description { get; set; } = string.Empty;
+
         public Guid HostId { get; set; }
     }
 }

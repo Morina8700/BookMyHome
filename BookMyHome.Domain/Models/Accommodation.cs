@@ -13,7 +13,13 @@ namespace BookMyHome.Domain.Models
 
         public string Address { get; private set; } = string.Empty;
 
+
         public decimal PricePerNight { get; private set; }
+
+        public string Description { get; private set; } = string.Empty;
+
+        public ICollection<AccommodationImage> Images { get; private set; }
+       = new List<AccommodationImage>();
 
         public Guid HostId { get; private set; }
 
@@ -27,22 +33,28 @@ namespace BookMyHome.Domain.Models
         }
 
         public Accommodation(
-            string name,
-            string address,
-            decimal pricePerNight,
-            Guid hostId)
+     string name,
+     string address,
+     string description,
+     decimal pricePerNight,
+     Guid hostId)
         {
             AccommodationId = Guid.NewGuid();
 
-            Update(name, address, pricePerNight);
+            Update(
+                name,
+                address,
+                description,
+                pricePerNight);
 
             HostId = hostId;
         }
 
         public void Update(
-            string name,
-            string address,
-            decimal pricePerNight)
+    string name,
+    string address,
+    string description,
+    decimal pricePerNight)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is required.");
@@ -50,12 +62,16 @@ namespace BookMyHome.Domain.Models
             if (string.IsNullOrWhiteSpace(address))
                 throw new ArgumentException("Address is required.");
 
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Description is required.");
+
             if (pricePerNight <= 0)
                 throw new ArgumentException(
                     "Price per night must be greater than 0.");
 
             Name = name;
             Address = address;
+            Description = description;
             PricePerNight = pricePerNight;
         }
     }

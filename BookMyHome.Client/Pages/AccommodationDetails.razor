@@ -1,0 +1,153 @@
+﻿@page "/accommodations/{Id:guid}"
+
+@using BookMyHome.Client.Models
+@using BookMyHome.Client.Services
+
+@inject AccommodationService AccommodationService
+@inject NavigationManager NavigationManager
+
+@if (accommodation == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="container">
+
+        <h1 class="mb-3">
+            @accommodation.Name
+        </h1>
+
+        @if (accommodation.Images.Any())
+        {
+            <div class="position-relative mb-4"
+                 style="max-width: 900px;">
+
+                <img src="@accommodation.Images[currentImageIndex].ImageUrl"
+                     alt="@accommodation.Name"
+                     class="img-fluid rounded shadow"
+                     style="width: 100%;
+                height: 500px;
+                object-fit: cover;" />
+
+                @if (accommodation.Images.Count > 1)
+                {
+                    <button class="btn btn-dark position-absolute top-50 start-0 translate-middle-y ms-3"
+                            @onclick="PreviousImage">
+                        ❮
+                    </button>
+
+                    <button class="btn btn-dark position-absolute top-50 end-0 translate-middle-y me-3"
+                            @onclick="NextImage">
+                        ❯
+                    </button>
+                }
+
+            </div>
+
+            <p>
+                Image @(currentImageIndex + 1)
+                of
+                @accommodation.Images.Count
+            </p>
+        }
+        else
+        {
+            <div class="alert alert-secondary">
+                No images available.
+            </div>
+        }
+
+        <hr />
+
+        <h3>About this accommodation</h3>
+
+        <p class="lead">
+            @accommodation.Description
+        </p>
+
+        <hr />
+
+        <p>
+            <strong>Address:</strong>
+            @accommodation.Address
+        </p>
+
+        <p>
+            <strong>Price per night:</strong>
+            @accommodation.PricePerNight kr.
+        </p>
+
+        <p>
+            <strong>Address:</strong>
+            @accommodation.Address
+        </p>
+
+        <p>
+            <strong>Price per night:</strong>
+            @accommodation.PricePerNight kr.
+        </p>
+
+
+
+        <a class="btn btn-warning"
+           href="@($"/accommodations/edit/{accommodation.AccommodationId}")">
+            Edit
+        </a>
+
+        <button class="btn btn-secondary ms-2"
+                @onclick="GoBack">
+            Back
+        </button>
+
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private AccommodationDto? accommodation;
+
+    private int currentImageIndex = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        accommodation =
+            await AccommodationService.GetByIdAsync(Id);
+    }
+
+    private void NextImage()
+    {
+        if (accommodation == null ||
+            accommodation.Images.Count == 0)
+            return;
+
+        currentImageIndex++;
+
+        if (currentImageIndex >= accommodation.Images.Count)
+        {
+            currentImageIndex = 0;
+        }
+    }
+
+    private void PreviousImage()
+    {
+        if (accommodation == null ||
+            accommodation.Images.Count == 0)
+            return;
+
+        currentImageIndex--;
+
+        if (currentImageIndex < 0)
+        {
+            currentImageIndex =
+                accommodation.Images.Count - 1;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/accommodations");
+    }
+}

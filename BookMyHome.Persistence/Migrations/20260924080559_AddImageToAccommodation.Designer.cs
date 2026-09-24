@@ -4,6 +4,7 @@ using BookMyHome.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookMyHome.Persistence.Migrations
 {
     [DbContext(typeof(BookMyHomeDbContext))]
-    partial class BookMyHomeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260924080559_AddImageToAccommodation")]
+    partial class AddImageToAccommodation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,12 +35,12 @@ namespace BookMyHome.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("HostId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -57,8 +60,8 @@ namespace BookMyHome.Persistence.Migrations
                         {
                             AccommodationId = new Guid("11111111-1111-1111-1111-111111111111"),
                             Address = "Beach Road 1",
-                            Description = "Hyggeligt sommerhus tæt på stranden med stor terrasse, lys stue og moderne køkken.",
                             HostId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            ImageUrl = "",
                             Name = "Beach House",
                             PricePerNight = 1200m
                         },
@@ -66,80 +69,10 @@ namespace BookMyHome.Persistence.Migrations
                         {
                             AccommodationId = new Guid("22222222-2222-2222-2222-222222222222"),
                             Address = "Main Street 10",
-                            Description = "",
                             HostId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            ImageUrl = "",
                             Name = "City Apartment",
                             PricePerNight = 850m
-                        });
-                });
-
-            modelBuilder.Entity("BookMyHome.Domain.Models.AccommodationImage", b =>
-                {
-                    b.Property<Guid>("AccommodationImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AccommodationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AccommodationImageId");
-
-                    b.HasIndex("AccommodationId");
-
-                    b.ToTable("AccommodationImages");
-
-                    b.HasData(
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000001"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-facade.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000002"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-facade-terrasse.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000003"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-alrum.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000004"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000005"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue-kurvesofa.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000006"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue-sofa.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000007"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue-udgang-terrasse.jpg"
-                        },
-                        new
-                        {
-                            AccommodationImageId = new Guid("10000000-0000-0000-0000-000000000008"),
-                            AccommodationId = new Guid("a09af322-d431-4be3-b01a-d7a444355088"),
-                            ImageUrl = "/Images/SommerHus1/Nova-idyll-plan.png"
                         });
                 });
 
@@ -241,17 +174,6 @@ namespace BookMyHome.Persistence.Migrations
                     b.Navigation("Host");
                 });
 
-            modelBuilder.Entity("BookMyHome.Domain.Models.AccommodationImage", b =>
-                {
-                    b.HasOne("BookMyHome.Domain.Models.Accommodation", "Accommodation")
-                        .WithMany("Images")
-                        .HasForeignKey("AccommodationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Accommodation");
-                });
-
             modelBuilder.Entity("BookMyHome.Domain.Models.Booking", b =>
                 {
                     b.HasOne("BookMyHome.Domain.Models.Accommodation", "Accommodation")
@@ -266,8 +188,6 @@ namespace BookMyHome.Persistence.Migrations
             modelBuilder.Entity("BookMyHome.Domain.Models.Accommodation", b =>
                 {
                     b.Navigation("Bookings");
-
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("BookMyHome.Domain.Models.Host", b =>

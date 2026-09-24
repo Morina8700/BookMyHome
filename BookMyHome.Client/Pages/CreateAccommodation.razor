@@ -32,6 +32,14 @@
                      @bind-Value="model.PricePerNight" />
     </div>
 
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+
+        <InputTextArea class="form-control"
+                       @bind-Value="model.Description"
+                       rows="5" />
+    </div>
+
     @if (!string.IsNullOrWhiteSpace(errorMessage))
     {
         <div class="alert alert-danger">

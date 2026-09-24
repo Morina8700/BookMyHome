@@ -17,6 +17,9 @@ namespace BookMyHome.Persistence.Data
             => Set<Accommodation>();
         public DbSet<Host> Hosts => Set<Host>();
 
+        public DbSet<AccommodationImage> AccommodationImages
+    => Set<AccommodationImage>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -44,6 +47,12 @@ namespace BookMyHome.Persistence.Data
                 .WithMany(a => a.Bookings)
                 .HasForeignKey(b => b.AccommodationId);
 
+            modelBuilder.Entity<AccommodationImage>()
+                .HasOne(i => i.Accommodation)
+                .WithMany(a => a.Images)
+                .HasForeignKey(i => i.AccommodationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Faste IDs til seed data
             var host1Id =
                 Guid.Parse("33333333-3333-3333-3333-333333333333");
@@ -54,11 +63,23 @@ namespace BookMyHome.Persistence.Data
             var accommodation2Id =
                 Guid.Parse("22222222-2222-2222-2222-222222222222");
 
+            var accommodation3Id =
+                Guid.Parse("A09AF322-D431-4BE3-B01A-D7A444355088");
+
             var booking1Id =
                 Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
             var booking2Id =
                 Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+
+            var image1Id = Guid.Parse("10000000-0000-0000-0000-000000000001");
+            var image2Id = Guid.Parse("10000000-0000-0000-0000-000000000002");
+            var image3Id = Guid.Parse("10000000-0000-0000-0000-000000000003");
+            var image4Id = Guid.Parse("10000000-0000-0000-0000-000000000004");
+            var image5Id = Guid.Parse("10000000-0000-0000-0000-000000000005");
+            var image6Id = Guid.Parse("10000000-0000-0000-0000-000000000006");
+            var image7Id = Guid.Parse("10000000-0000-0000-0000-000000000007");
+            var image8Id = Guid.Parse("10000000-0000-0000-0000-000000000008");
 
 
             // RELATION: Host -> Accommodations
@@ -93,6 +114,7 @@ namespace BookMyHome.Persistence.Data
                     AccommodationId = accommodation1Id,
                     Name = "Beach House",
                     Address = "Beach Road 1",
+                    Description = "Hyggeligt sommerhus tæt på stranden med stor terrasse, lys stue og moderne køkken.",
                     PricePerNight = 1200m,
                     HostId = host1Id
                 },
@@ -102,6 +124,7 @@ namespace BookMyHome.Persistence.Data
                     AccommodationId = accommodation2Id,
                     Name = "City Apartment",
                     Address = "Main Street 10",
+                    Description = "",
                     PricePerNight = 850m,
                     HostId = host1Id
                 }
@@ -126,6 +149,57 @@ namespace BookMyHome.Persistence.Data
                     AccommodationId = accommodation1Id
                 }
             );
+
+            modelBuilder.Entity<AccommodationImage>().HasData(
+    new
+    {
+        AccommodationImageId = image1Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-facade.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image2Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-facade-terrasse.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image3Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-alrum.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image4Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image5Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue-kurvesofa.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image6Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue-sofa.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image7Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-inde-stue-udgang-terrasse.jpg",
+        AccommodationId = accommodation3Id
+    },
+    new
+    {
+        AccommodationImageId = image8Id,
+        ImageUrl = "/Images/SommerHus1/Nova-idyll-plan.png",
+        AccommodationId = accommodation3Id
+    }
+);
 
         }
 

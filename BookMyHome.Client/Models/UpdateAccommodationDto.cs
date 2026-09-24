@@ -7,5 +7,7 @@
         public string Address { get; set; } = string.Empty;
 
         public decimal PricePerNight { get; set; }
+
+        public string Description { get; set; } = string.Empty;
     }
 }

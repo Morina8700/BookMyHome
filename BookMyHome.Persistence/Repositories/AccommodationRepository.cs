@@ -19,15 +19,18 @@ namespace BookMyHome.Persistence.Repositories
         public async Task<List<Accommodation>> GetAllAsync()
         {
             return await _context.Accommodations
-            .Include(a => a.Host)
-            .ToListAsync();
+        .Include(a => a.Images)
+        .Include(a => a.Host)
+        .ToListAsync();
         }
 
         public async Task<Accommodation?> GetByIdAsync(Guid id)
         {
             return await _context.Accommodations
-                .Include(b => b.Host)
-                .FirstOrDefaultAsync(b => b.AccommodationId == id);
+     .Include(a => a.Images)
+    .Include(a => a.Host)
+    .FirstOrDefaultAsync(
+        a => a.AccommodationId == id);
         }
 
         public async Task AddAsync(Accommodation newAccommodation)
@@ -38,20 +41,24 @@ namespace BookMyHome.Persistence.Repositories
         }
 
         public async Task UpdateAsync(
-            Guid id,
-            string name,
-            string address,
-            decimal pricePerNight
-            )
+      Guid id,
+      string name,
+      string address,
+      string description,
+      decimal pricePerNight)
         {
             var accommodation = await _context.Accommodations
-                .FirstOrDefaultAsync(a => a.AccommodationId == id);
+                .FirstOrDefaultAsync(
+                    a => a.AccommodationId == id);
 
-            if( accommodation == null )
-            {
+            if (accommodation == null)
                 throw new KeyNotFoundException();
-            }
-            accommodation.Update(name, address, pricePerNight);
+
+            accommodation.Update(
+                name,
+                address,
+                description,
+                pricePerNight);
 
             await _context.SaveChangesAsync();
         }
@@ -75,6 +82,43 @@ namespace BookMyHome.Persistence.Repositories
             return await _context.Bookings
                 .Where(b => b.AccommodationId == accommodationId)
                 .ToListAsync();
+        }
+
+
+        public async Task<AccommodationImage> AddImageAsync(
+    Guid accommodationId,
+    string imageUrl)
+        {
+            var accommodation = await _context.Accommodations
+                .FirstOrDefaultAsync(
+                    a => a.AccommodationId == accommodationId);
+
+            if (accommodation == null)
+                throw new KeyNotFoundException();
+
+            var image = new AccommodationImage(
+                imageUrl,
+                accommodationId);
+
+            _context.AccommodationImages.Add(image);
+
+            await _context.SaveChangesAsync();
+
+            return image;
+        }
+
+        public async Task DeleteImageAsync(Guid imageId)
+        {
+            var image = await _context.AccommodationImages
+                .FirstOrDefaultAsync(
+                    i => i.AccommodationImageId == imageId);
+
+            if (image == null)
+                return;
+
+            _context.AccommodationImages.Remove(image);
+
+            await _context.SaveChangesAsync();
         }
 
 

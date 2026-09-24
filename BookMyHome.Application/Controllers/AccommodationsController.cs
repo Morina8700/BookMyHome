@@ -44,6 +44,7 @@ namespace BookMyHome.Application.Controllers
                 var accommodation = new Accommodation(
                     dto.Name,
                     dto.Address,
+                    dto.Description,
                     dto.PricePerNight,
                     dto.HostId);
 
@@ -71,6 +72,7 @@ namespace BookMyHome.Application.Controllers
                     id,
                     dto.Name,
                     dto.Address,
+                    dto.Description,
                     dto.PricePerNight);
 
                 return NoContent();
@@ -109,6 +111,45 @@ namespace BookMyHome.Application.Controllers
             var bookings = await _repository.GetBookingsAsync(id);
 
             return Ok(bookings);
+        }
+
+        [HttpPost("{id:guid}/images")]
+        public async Task<ActionResult> AddImage(
+    Guid id,
+    AddAccommodationImageDto dto)
+        {
+            try
+            {
+                var image = await _repository.AddImageAsync(
+                    id,
+                    dto.ImageUrl);
+
+                return Ok(image);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id:guid}/images/{imageId:guid}")]
+        public async Task<IActionResult> DeleteImage(
+    Guid id,
+    Guid imageId)
+        {
+            var accommodation =
+                await _repository.GetByIdAsync(id);
+
+            if (accommodation == null)
+                return NotFound();
+
+            await _repository.DeleteImageAsync(imageId);
+
+            return NoContent();
         }
     }
 }

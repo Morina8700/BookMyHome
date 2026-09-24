@@ -10,6 +10,11 @@
 
         public decimal PricePerNight { get; set; }
 
+        public string Description { get; set; } = string.Empty;
+
         public Guid HostId { get; set; }
+
+        public List<AccommodationImageDto> Images { get; set; }
+     = new();
     }
 }

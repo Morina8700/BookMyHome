@@ -8,7 +8,7 @@
 <h1>Accommodations</h1>
 
 <a href="/accommodations/create"
-   class="btn btn-primary mb-3">
+   class="btn btn-primary mb-4">
     Create Accommodation
 </a>
 
@@ -22,27 +22,48 @@ else if (accommodations.Count == 0)
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Price per night</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+    <div class="row">
 
-        <tbody>
-            @foreach (var accommodation in accommodations)
-            {
-                <tr>
-                    <td>@accommodation.Name</td>
-                    <td>@accommodation.Address</td>
-                    <td>@accommodation.PricePerNight</td>
+        @foreach (var accommodation in accommodations)
+        {
+            <div class="col-md-4 mb-4">
 
-                    <td>
-                        <a class="btn btn-warning me-2"
-                           href="@($"accommodations/edit/{accommodation.AccommodationId}")">
+                <div class="card h-100 shadow-sm">
+
+                    <a href="@($"/accommodations/{accommodation.AccommodationId}")"
+                       style="text-decoration: none; color: inherit;">
+
+                        @if (accommodation.Images.Any())
+                        {
+                            <img src="@accommodation.Images.First().ImageUrl"
+                                 class="card-img-top"
+                                 alt="@accommodation.Name"
+                                 style="height: 230px;
+                            object-fit: cover;" />
+                        }
+
+                        <div class="card-body">
+
+                            <h4 class="card-title">
+                                @accommodation.Name
+                            </h4>
+
+                            <p class="card-text">
+                                @accommodation.Address
+                            </p>
+
+                            <h5>
+                                @accommodation.PricePerNight kr. / night
+                            </h5>
+
+                        </div>
+
+                    </a>
+
+                    <div class="card-footer">
+
+                        <a class="btn btn-warning"
+                           href="@($"/accommodations/edit/{accommodation.AccommodationId}")">
                             Edit
                         </a>
 
@@ -50,11 +71,15 @@ else
                                 @onclick="() => DeleteAccommodation(accommodation.AccommodationId)">
                             Delete
                         </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
 }
 
 @code {
