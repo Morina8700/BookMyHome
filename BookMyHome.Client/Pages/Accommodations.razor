@@ -1,0 +1,76 @@
+﻿@page "/accommodations"
+
+@using BookMyHome.Client.Models
+@using BookMyHome.Client.Services
+
+@inject AccommodationService AccommodationService
+
+<h1>Accommodations</h1>
+
+<a href="/accommodations/create"
+   class="btn btn-primary mb-3">
+    Create Accommodation
+</a>
+
+@if (accommodations == null)
+{
+    <p>Loading...</p>
+}
+else if (accommodations.Count == 0)
+{
+    <p>No accommodations found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Price per night</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var accommodation in accommodations)
+            {
+                <tr>
+                    <td>@accommodation.Name</td>
+                    <td>@accommodation.Address</td>
+                    <td>@accommodation.PricePerNight</td>
+
+                    <td>
+                        <a class="btn btn-warning me-2"
+                           href="@($"accommodations/edit/{accommodation.AccommodationId}")">
+                            Edit
+                        </a>
+
+                        <button class="btn btn-danger"
+                                @onclick="() => DeleteAccommodation(accommodation.AccommodationId)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<AccommodationDto>? accommodations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        accommodations =
+            await AccommodationService.GetAllAsync();
+    }
+
+    private async Task DeleteAccommodation(Guid id)
+    {
+        await AccommodationService.DeleteAsync(id);
+
+        accommodations =
+            await AccommodationService.GetAllAsync();
+    }
+}

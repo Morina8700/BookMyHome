@@ -1,0 +1,114 @@
+﻿@page "/accommodations/edit/{Id:guid}"
+
+@using BookMyHome.Client.Models
+@using BookMyHome.Client.Services
+
+@inject AccommodationService AccommodationService
+@inject NavigationManager NavigationManager
+
+<h1>Edit Accommodation</h1>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="model"
+              OnValidSubmit="HandleUpdate">
+
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+
+            <InputText class="form-control"
+                       @bind-Value="model.Name" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+
+            <InputText class="form-control"
+                       @bind-Value="model.Address" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Price per night</label>
+
+            <InputNumber class="form-control"
+                         @bind-Value="model.PricePerNight" />
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger">
+                @errorMessage
+            </div>
+        }
+
+        <button type="submit"
+                class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <button type="button"
+                class="btn btn-secondary ms-2"
+                @onclick="Cancel">
+            Cancel
+        </button>
+
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private UpdateAccommodationDto model = new();
+
+    private bool isLoading = true;
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var accommodation =
+            await AccommodationService.GetByIdAsync(Id);
+
+        if (accommodation == null)
+        {
+            NavigationManager.NavigateTo("/accommodations");
+            return;
+        }
+
+        model = new UpdateAccommodationDto
+        {
+            Name = accommodation.Name,
+            Address = accommodation.Address,
+            PricePerNight = accommodation.PricePerNight
+        };
+
+        isLoading = false;
+    }
+
+    private async Task HandleUpdate()
+    {
+        errorMessage = null;
+
+        var response =
+            await AccommodationService.UpdateAsync(Id, model);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/accommodations");
+            return;
+        }
+
+        errorMessage =
+            await response.Content.ReadAsStringAsync();
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/accommodations");
+    }
+}

@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="BookMyHome.Application/BookMyHome.Application.csproj" />
+  <Project Path="BookMyHome.Client/BookMyHome.Client.csproj" Id="df627008-1ce9-4b78-93ca-ad62badd23f0" />
   <Project Path="BookMyHome.Domain/BookMyHome.Domain.csproj" />
   <Project Path="BookMyHome.Persistence/BookMyHome.Persistence.csproj" />
 </Solution>

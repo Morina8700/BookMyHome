@@ -1,0 +1,85 @@
+﻿@page "/bookings"
+
+@using BookMyHome.Client.Models
+@using BookMyHome.Client.Services
+
+@inject BookingService BookingService
+@inject AccommodationService AccommodationService
+
+<h1>Bookings</h1>
+
+<a href="/bookings/create"
+   class="btn btn-primary mb-3">
+    Create Booking
+</a>
+
+@if (bookings == null)
+{
+    <p>Loading...</p>
+}
+else if (bookings.Count == 0)
+{
+    <p>No bookings found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                
+                <th>Start date</th>
+                <th>End date</th>
+                <th>Accommodation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var booking in bookings)
+            {
+                <tr>
+                    <td>@booking.StartDate</td>
+                    <td>@booking.EndDate</td>
+                    <td>@GetAccommodationName(booking.AccommodationId)</td>
+                    <td>
+                        <a class="btn btn-warning me-2"
+                           href="@($"bookings/edit/{booking.BookingId}")">
+                            Edit
+                        </a>
+                        <button class="btn btn-danger"
+                                @onclick="() => DeleteBooking(booking.BookingId)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<BookingDto>? bookings;
+    private List<AccommodationDto>? accommodations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        accommodations = await AccommodationService.GetAllAsync();
+        bookings = await BookingService.GetAllAsync();
+    }
+
+    private async Task DeleteBooking(Guid id)
+    {
+        await BookingService.DeleteAsync(id);
+
+        bookings = await BookingService.GetAllAsync();
+    }
+
+    private string GetAccommodationName(Guid accommodationId)
+    {
+        var accommodation = accommodations?
+            .FirstOrDefault(a =>
+                a.AccommodationId == accommodationId);
+
+        return accommodation?.Name ?? "Unknown";
+    }
+}

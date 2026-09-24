@@ -2,7 +2,7 @@
 using BookMyHome.Domain.Models;
 using BookMyHome.Persistence.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using BookMyHome.Application.DTO;
+using BookMyHome.Application.DTO.Booking;
 
 namespace BookMyHome.Application.Controllers
 {
@@ -81,22 +81,26 @@ namespace BookMyHome.Application.Controllers
     Guid id,
     UpdateBookingDto dto)
         {
-            var existingBooking = await _repository.GetByIdAsync(id);
-
-            if (existingBooking == null)
-            {
-                return NotFound();
-            }
-
             try
             {
                 await _repository.UpdateAsync(
                     id,
                     dto.StartDate,
                     dto.EndDate,
-                    dto.AccommodationId);
+                    dto.AccommodationId,
+                    dto.RowVersion);
+
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
             catch (OverlapingBookingException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (BookingConcurrencyException ex)
             {
                 return Conflict(ex.Message);
             }
@@ -104,8 +108,6 @@ namespace BookMyHome.Application.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
-            return NoContent();
         }
 
 

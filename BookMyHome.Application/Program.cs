@@ -20,9 +20,23 @@ builder.Services.AddControllers()
     });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<AccommodationRepository>();
 builder.Services.AddScoped<BookingRepository>();
+builder.Services.AddCors(options =>
+{
+
+    options.AddPolicy("BlazorClient", policy =>
+    {
+        policy
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
+
+app.UseCors("BlazorClient");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

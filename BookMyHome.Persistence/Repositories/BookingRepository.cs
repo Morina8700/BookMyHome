@@ -60,18 +60,17 @@ namespace BookMyHome.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
         public async Task UpdateAsync(
-    Guid id,
-    DateOnly startDate,
-    DateOnly endDate,
-    Guid accommodationId)
+     Guid id,
+     DateOnly startDate,
+     DateOnly endDate,
+     Guid accommodationId,
+     byte[] rowVersion)
         {
             var booking = await _context.Bookings
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null)
-            {
                 throw new KeyNotFoundException();
-            }
 
             bool hasOverlap = await _context.Bookings.AnyAsync(b =>
                 b.BookingId != id &&
@@ -90,7 +89,19 @@ namespace BookMyHome.Persistence.Repositories
                 endDate,
                 accommodationId);
 
-            await _context.SaveChangesAsync();
+            _context.Entry(booking)
+                .Property(b => b.RowVersion)
+                .OriginalValue = rowVersion;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new BookingConcurrencyException(
+                    "The booking has been changed by another user.");
+            }
         }
 
     }

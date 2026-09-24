@@ -1,0 +1,136 @@
+﻿@page "/bookings/edit/{Id:guid}"
+
+@using BookMyHome.Client.Models
+@using BookMyHome.Client.Services
+
+@inject BookingService BookingService
+@inject AccommodationService AccommodationService
+@inject NavigationManager NavigationManager
+
+<h1>Edit Booking</h1>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="model"
+              OnValidSubmit="HandleUpdateBooking">
+
+        <div class="mb-3">
+            <label class="form-label">
+                Accommodation
+            </label>
+
+            <InputSelect class="form-select"
+                         @bind-Value="model.AccommodationId">
+
+                @foreach (var accommodation in accommodations)
+                {
+                    <option value="@accommodation.AccommodationId">
+                        @accommodation.Name
+                    </option>
+                }
+
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Start date
+            </label>
+
+            <InputDate class="form-control"
+                       @bind-Value="model.StartDate" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                End date
+            </label>
+
+            <InputDate class="form-control"
+                       @bind-Value="model.EndDate" />
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger">
+                @errorMessage
+            </div>
+        }
+
+        <button type="submit"
+                class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <button type="button"
+                class="btn btn-secondary ms-2"
+                @onclick="Cancel">
+            Cancel
+        </button>
+
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private UpdateBookingDto model = new();
+
+    private List<AccommodationDto> accommodations = new();
+
+    private string? errorMessage;
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        accommodations =
+            await AccommodationService.GetAllAsync();
+
+        var booking =
+            await BookingService.GetByIdAsync(Id);
+
+        if (booking == null)
+        {
+            NavigationManager.NavigateTo("/bookings");
+            return;
+        }
+
+        model = new UpdateBookingDto
+        {
+            StartDate = booking.StartDate,
+            EndDate = booking.EndDate,
+            AccommodationId = booking.AccommodationId,
+            RowVersion = booking.RowVersion
+        };
+
+        isLoading = false;
+    }
+
+    private async Task HandleUpdateBooking()
+    {
+        errorMessage = null;
+
+        var response =
+            await BookingService.UpdateAsync(Id, model);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/bookings");
+            return;
+        }
+
+        errorMessage =
+            await response.Content.ReadAsStringAsync();
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/bookings");
+    }
+}

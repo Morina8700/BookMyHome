@@ -1,0 +1,131 @@
+﻿@page "/bookings/create"
+
+@using BookMyHome.Client.Models
+@using BookMyHome.Client.Services
+
+@inject BookingService BookingService
+@inject AccommodationService AccommodationService
+@inject NavigationManager NavigationManager
+
+<h1>Create Booking</h1>
+
+@if (accommodations == null)
+{
+    <p>Loading accommodations...</p>
+}
+else
+{
+    <EditForm Model="model"
+              OnValidSubmit="HandleCreateBooking">
+
+        <div class="mb-3">
+            <label class="form-label">
+                Accommodation
+            </label>
+
+            <InputSelect class="form-select"
+                         @bind-Value="model.AccommodationId">
+
+                <option value="@Guid.Empty">
+                    Select accommodation
+                </option>
+
+                @foreach (var accommodation in accommodations)
+                {
+                    <option value="@accommodation.AccommodationId">
+                        @accommodation.Name
+                    </option>
+                }
+
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Start date
+            </label>
+
+            <InputDate class="form-control"
+                       @bind-Value="model.StartDate" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                End date
+            </label>
+
+            <InputDate class="form-control"
+                       @bind-Value="model.EndDate" />
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger">
+                @errorMessage
+            </div>
+        }
+
+        <button type="submit"
+                class="btn btn-primary">
+            Create Booking
+        </button>
+
+        <button type="button"
+                class="btn btn-secondary ms-2"
+                @onclick="Cancel">
+            Cancel
+        </button>
+
+    </EditForm>
+}
+
+@code {
+    private CreateBookingDto model = new()
+    {
+        StartDate =
+            DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
+
+        EndDate =
+            DateOnly.FromDateTime(DateTime.Today.AddDays(2))
+    };
+
+    private List<AccommodationDto>? accommodations;
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        accommodations =
+            await AccommodationService.GetAllAsync();
+    }
+
+    private async Task HandleCreateBooking()
+    {
+        errorMessage = null;
+
+        if (model.AccommodationId == Guid.Empty)
+        {
+            errorMessage =
+                "Please select an accommodation.";
+
+            return;
+        }
+
+        var response =
+            await BookingService.CreateAsync(model);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/bookings");
+            return;
+        }
+
+        errorMessage =
+            await response.Content.ReadAsStringAsync();
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/bookings");
+    }
+}
